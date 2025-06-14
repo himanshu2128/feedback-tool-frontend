@@ -5,6 +5,9 @@ interface FeedbackFormProps {
   onSuccess?: () => void;
 }
 
+// ✅ Set your deployed backend URL here (easier to change later)
+const API_BASE_URL = "https://feedback-tool-backend-1.onrender.com";
+
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
   const [message, setMessage] = useState("");
 
@@ -14,9 +17,9 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
     if (!message.trim()) return;
 
     try {
-      await axios.post("http://localhost:5000/api/feedback", { message });
+      await axios.post(`${API_BASE_URL}/api/feedback`, { message });
       setMessage("");
-      onSuccess?.(); // Optional call if provided
+      onSuccess?.(); // Notify parent to refresh feedback list
     } catch (error) {
       console.error("Error submitting feedback:", error);
     }

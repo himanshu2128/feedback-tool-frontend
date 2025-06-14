@@ -7,12 +7,15 @@ interface FeedbackItem {
   timestamp: string;
 }
 
+// ✅ Set your deployed backend URL here
+const API_BASE_URL = "https://feedback-tool-backend-1.onrender.com";
+
 const AdminDashboard: React.FC = () => {
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
 
   const fetchFeedback = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/feedback");
+      const response = await axios.get(`${API_BASE_URL}/api/feedback`);
       setFeedbackList(response.data.feedbackList);
     } catch (error) {
       console.error("Error fetching feedback:", error);
@@ -21,7 +24,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:5000/api/feedback/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/feedback/${id}`);
       fetchFeedback(); // Refresh list after deletion
     } catch (error) {
       console.error("Error deleting feedback:", error);
