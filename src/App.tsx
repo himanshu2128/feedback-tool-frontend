@@ -1,12 +1,11 @@
-// src/App.tsx
-import React, { useState } from "react";
+import { useState } from "react"; // ✅ this is required
 import FeedbackForm from "./pages/FeedbackForm";
 import FeedbackList from "./pages/FeedbackList";
 import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   const [refreshList, setRefreshList] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // toggle between admin & user view
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleNewFeedback = () => {
     setRefreshList(!refreshList);

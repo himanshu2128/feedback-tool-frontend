@@ -1,52 +1,41 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
-interface Feedback {
-  id: number;
-  message: string;
-  timestamp: string;
+interface FeedbackFormProps {
+  onSuccess?: () => void;
 }
 
-const FeedbackList = () => {
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const fetchFeedback = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/feedback`);
-        setFeedbacks(res.data.feedbackList);
-      } catch (err) {
-        console.error("Failed to load feedback:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    fetchFeedback();
-  }, []);
+    if (!message.trim()) return;
+
+    try {
+      await axios.post("http://localhost:5000/api/feedback", { message });
+      setMessage("");
+      onSuccess?.(); // Optional call if provided
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+    }
+  };
 
   return (
-    <div className="max-w-3xl mx-auto mt-8 p-4 border rounded shadow">
-      <h2 className="text-xl font-bold mb-4">📋 Submitted Feedback</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : feedbacks.length === 0 ? (
-        <p>No feedback submitted yet.</p>
-      ) : (
-        <ul className="space-y-4">
-          {feedbacks.map((fb) => (
-            <li key={fb.id} className="p-3 border rounded bg-gray-50">
-              <p className="text-gray-800">{fb.message}</p>
-              <p className="text-sm text-gray-500">
-                Submitted at: {new Date(fb.timestamp).toLocaleString()}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <form onSubmit={handleSubmit}>
+      <textarea
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Write your feedback here..."
+        rows={4}
+        cols={40}
+        required
+      />
+      <br />
+      <button type="submit">Submit Feedback</button>
+    </form>
   );
 };
 
-export default FeedbackList;
+export default FeedbackForm;
