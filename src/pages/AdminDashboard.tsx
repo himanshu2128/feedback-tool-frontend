@@ -1,55 +1,108 @@
-import React, { useEffect, useState } from "react";
+// src/pages/AdminDashboard.tsx
+
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 interface FeedbackItem {
-  id: number;
+  _id: string;
   message: string;
   timestamp: string;
 }
 
-// ✅ Set your deployed backend URL here
-const API_BASE_URL = "https://feedback-tool-backend-1.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard: React.FC = () => {
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState(localStorage.getItem("adminToken") || "");
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
+  const [error, setError] = useState("");
 
-  const fetchFeedback = async () => {
+  const handleLogin = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/feedback`);
-      setFeedbackList(response.data.feedbackList);
-    } catch (error) {
-      console.error("Error fetching feedback:", error);
+      const response = await axios.post(`${API_BASE_URL}/api/admin/login`, {
+        password,
+      });
+      const { token } = response.data;
+      localStorage.setItem("adminToken", token);
+      setToken(token);
+      setPassword("");
+      setError("");
+    } catch (err) {
+      console.error(err);
+      setError("❌ Invalid password");
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const fetchFeedbacks = async () => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/feedback/${id}`);
-      fetchFeedback(); // Refresh list after deletion
-    } catch (error) {
-      console.error("Error deleting feedback:", error);
+      const response = await axios.get(`${API_BASE_URL}/api/feedback`);
+      setFeedbackList(response.data.feedbackList);
+    } catch (err) {
+      console.error("Failed to fetch feedback:", err);
     }
   };
 
   useEffect(() => {
-    fetchFeedback();
-  }, []);
+    if (token) {
+      fetchFeedbacks();
+    }
+  }, [token]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    setToken("");
+    setFeedbackList([]);
+  };
+
+  if (!token) {
+    // 👇 Show password input if not logged in
+    return (
+      <div className="p-4 max-w-md mx-auto">
+        <h2 className="text-lg font-semibold mb-2">🔐 Admin Login</h2>
+        <input
+          type="password"
+          className="w-full p-2 border rounded mb-2"
+          placeholder="Enter admin password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button
+          onClick={handleLogin}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Login
+        </button>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </div>
+    );
+  }
+
+  // 👇 Show feedback list after login
   return (
-    <div>
-      <h2>🛠️ Admin Dashboard</h2>
+    <div className="p-4 max-w-2xl mx-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">📋 Admin Dashboard</h2>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+
       {feedbackList.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
-        <ul>
+        <ul className="space-y-2">
           {feedbackList.map((item) => (
-            <li key={item.id}>
-              <strong>{item.message}</strong>
-              <br />
-              <small>{new Date(item.timestamp).toLocaleString()}</small>
-              <br />
-              <button onClick={() => handleDelete(item.id)}>Delete</button>
-              <hr />
+            <li
+              key={item._id}
+              className="border p-2 rounded shadow-sm bg-gray-50"
+            >
+              <p>{item.message}</p>
+              <small className="text-gray-500">
+                {new Date(item.timestamp).toLocaleString()}
+              </small>
             </li>
           ))}
         </ul>

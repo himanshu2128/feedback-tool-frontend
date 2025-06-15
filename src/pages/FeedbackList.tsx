@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 interface FeedbackItem {
-  id: number;
+  _id: string;
   message: string;
   timestamp: string;
 }
@@ -11,7 +11,6 @@ interface FeedbackListProps {
   refreshTrigger: boolean;
 }
 
-// ✅ Use environment variable (set in .env)
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
@@ -19,8 +18,8 @@ const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
 
   const fetchFeedback = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/feedback`);
-      setFeedbackList(response.data.feedbackList);
+      const response = await axios.get(`${API_BASE_URL}/api/feedbacks`);
+      setFeedbackList(response.data);
     } catch (error) {
       console.error("Error fetching feedback:", error);
     }
@@ -28,14 +27,14 @@ const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
 
   useEffect(() => {
     fetchFeedback();
-  }, [refreshTrigger]); // refetch when refreshTrigger changes
+  }, [refreshTrigger]);
 
   return (
     <div>
       <h2>All Feedback</h2>
       <ul>
         {feedbackList.map((item) => (
-          <li key={item.id}>
+          <li key={item._id}>
             {item.message}
             <br />
             <small>{new Date(item.timestamp).toLocaleString()}</small>

@@ -1,43 +1,68 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, FormEvent } from "react";
 
-interface FeedbackFormProps {
-  onSuccess?: () => void;
-}
-
-// ✅ Set your deployed backend URL here (easier to change later)
-const API_BASE_URL = "https://feedback-tool-backend-1.onrender.com";
+// ✅ Define props type
+type FeedbackFormProps = {
+  onSuccess: () => void;
+};
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (!message.trim()) return;
+    setStatus("Sending...");
 
     try {
-      await axios.post(`${API_BASE_URL}/api/feedback`, { message });
-      setMessage("");
-      onSuccess?.(); // Notify parent to refresh feedback list
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      type FeedbackResponse = {
+        success: boolean;
+        error?: string;
+      };
+
+      const data: FeedbackResponse = await response.json();
+
+      if (data.success) {
+        setMessage("");
+        setStatus("✅ Feedback submitted successfully!");
+        onSuccess(); // ✅ Call the parent function to refresh the list
+      } else {
+        setStatus("❌ Failed to submit feedback.");
+      }
     } catch (error) {
       console.error("Error submitting feedback:", error);
+      setStatus("❌ Error connecting to server.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Write your feedback here..."
-        rows={4}
-        cols={40}
-        required
-      />
-      <br />
-      <button type="submit">Submit Feedback</button>
-    </form>
+    <div className="p-4 max-w-md mx-auto">
+      <h1 className="text-xl font-bold mb-4">📝 Submit Feedback</h1>
+      <form onSubmit={handleSubmit}>
+        <textarea
+          className="w-full p-2 border rounded mb-2"
+          rows={4}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Enter your feedback..."
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+        >
+          Submit
+        </button>
+      </form>
+      {status && <p className="mt-2 text-sm">{status}</p>}
+    </div>
   );
 };
 
