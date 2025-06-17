@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { sendFeedback, getFeedback } from './api';
+import { submitFeedback } from "./components/api"; // ✅ correct path
+
 
 export default function App() {
   const [message, setMessage] = useState('');
