@@ -1,9 +1,18 @@
-// frontend/src/services/api.js
-import axios from 'axios';
+export const API_BASE_URL = "https://feedback-tool-backend-1.onrender.com";
 
-const api = axios.create({
-  baseURL: 'https://feedback-tool-backen.onrender.com/api', // ✅ your Render backend URL
-  withCredentials: true, // optional
-});
+export async function submitFeedback(message) {
+return fetch("https://feedback-tool-backend-1.onrender.com/api/feedback", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
 
-export default api;
+  return response.json();
+}
+
+export async function getAllFeedback() {
+  const response = await fetch(`${API_BASE_URL}/api/feedback`);
+  return response.json();
+}

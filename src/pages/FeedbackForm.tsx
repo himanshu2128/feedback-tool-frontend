@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from "react";
+import { submitFeedback } from "../components/api"; // ✅ Import API call
 
-// ✅ Define props type
 type FeedbackFormProps = {
   onSuccess: () => void;
 };
@@ -14,25 +14,12 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
     setStatus("Sending...");
 
     try {
-      const response = await fetch("/api/feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-      });
+      const result = await submitFeedback({ message });
 
-      type FeedbackResponse = {
-        success: boolean;
-        error?: string;
-      };
-
-      const data: FeedbackResponse = await response.json();
-
-      if (data.success) {
+      if (result.success) {
         setMessage("");
         setStatus("✅ Feedback submitted successfully!");
-        onSuccess(); // ✅ Call the parent function to refresh the list
+        onSuccess(); // Refresh feedback list if needed
       } else {
         setStatus("❌ Failed to submit feedback.");
       }
