@@ -1,45 +1,36 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import axios from "axios";
 
-const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+interface Props {
+  onLogin?: () => void;
+}
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+const Login: React.FC<Props> = ({ onLogin }) => {
+  const [password, setPassword] = useState("");
 
+  const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
-        username,
+      const res = await axios.post("http://localhost:5000/api/admin/login", {
         password,
       });
-
       const token = res.data.token;
-      localStorage.setItem('adminToken', token);
-      navigate('/admin');
+      localStorage.setItem("adminToken", token);
+      if (onLogin) onLogin();
     } catch (err) {
-      alert('Invalid credentials');
+      alert("Invalid password");
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
+    <div>
       <h2>Admin Login</h2>
-      <form onSubmit={handleLogin}>
-        <label>
-          Username:<br />
-          <input value={username} onChange={(e) => setUsername(e.target.value)} />
-        </label>
-        <br /><br />
-        <label>
-          Password:<br />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-        <br /><br />
-        <button type="submit">Login</button>
-      </form>
+      <input
+        type="password"
+        placeholder="Enter admin password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 };

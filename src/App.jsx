@@ -1,17 +1,34 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import UserFeedback from './UserFeedback'; // your current feedback form component
-import AdminLogin from './AdminLogin';
-import AdminDashboard from './AdminDashboard';
+import React, { useState } from "react";
+import FeedbackForm from "./pages/FeedbackForm";
+import FeedbackList from "./pages/FeedbackList";
+import AdminDashboard from "./pages/AdminDashboard";
 
-export default function App() {
+function App() {
+  const [refreshList, setRefreshList] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleNewFeedback = () => {
+    setRefreshList(!refreshList);
+  };
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<UserFeedback />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="app-container">
+      <h1>📢 Feedback Tool</h1>
+      <button onClick={() => setIsAdmin(!isAdmin)}>
+        {isAdmin ? "🔙 Back to Feedback Form" : "🛠️ Admin Dashboard"}
+      </button>
+
+      {isAdmin ? (
+        <AdminDashboard />
+      ) : (
+        <>
+          <FeedbackForm onSuccess={handleNewFeedback} />
+          <hr />
+          <FeedbackList refreshTrigger={refreshList} />
+        </>
+      )}
+    </div>
   );
 }
+
+export default App;

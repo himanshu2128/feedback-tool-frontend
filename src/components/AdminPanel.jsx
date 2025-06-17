@@ -1,34 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { getAllFeedback } from './api';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const AdminPanel = () => {
-  const [feedbacks, setFeedbacks] = useState([]);
+export default function AdminDashboard() {
+  const [feedbackList, setFeedbackList] = useState([]);
 
   useEffect(() => {
-    getAllFeedback().then(res => {
-      if (res.success) setFeedbacks(res.data);
-    });
+    const fetchFeedback = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/feedback");
+        setFeedbackList(res.data.feedbackList);
+      } catch (err) {
+        console.error("Error fetching feedback:", err);
+      }
+    };
+
+    fetchFeedback();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAdmin');
-    window.location.href = '/admin'; // refresh to login screen
-  };
-
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto' }}>
-      <h1>📊 Admin Panel</h1>
-      <button onClick={handleLogout} style={{ marginBottom: '1rem' }}>Logout</button>
+    <div>
+      <h2>Admin Dashboard</h2>
       <ul>
-        {feedbacks.map(fb => (
-          <li key={fb._id} style={{ marginBottom: '10px' }}>
-            <strong>{fb.message}</strong><br />
-            <small>{new Date(fb.createdAt).toLocaleString()}</small>
+        {feedbackList.map((f, index) => (
+          <li key={index}>
+            {f.message} - {new Date(f.timestamp).toLocaleString()}
           </li>
         ))}
       </ul>
     </div>
   );
-};
-
-export default AdminPanel;
+}
