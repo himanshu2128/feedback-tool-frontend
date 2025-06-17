@@ -1,15 +1,15 @@
 import React, { useState, FormEvent } from "react";
-import { submitFeedback } from "../components/api"; // ✅ Import API call
+import { submitFeedback } from "../components/api";
 
 type FeedbackFormProps = {
   onSuccess: () => void;
 };
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
-  const [message, setMessage] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("Sending...");
 
@@ -19,7 +19,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSuccess }) => {
       if (result.success) {
         setMessage("");
         setStatus("✅ Feedback submitted successfully!");
-        onSuccess(); // Refresh feedback list if needed
+        onSuccess();
       } else {
         setStatus("❌ Failed to submit feedback.");
       }
