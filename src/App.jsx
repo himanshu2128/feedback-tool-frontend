@@ -1,3 +1,5 @@
+console.log("Loaded API URL:", import.meta.env.VITE_API_URL);
+
 import React, { useState } from "react";
 import FeedbackForm from "./pages/FeedbackForm";
 import FeedbackList from "./pages/FeedbackList";
