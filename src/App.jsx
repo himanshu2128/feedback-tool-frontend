@@ -6,22 +6,28 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 
 function App() {
-  const isAdmin = localStorage.getItem("admin") === "true";
+  const isAdmin = !!localStorage.getItem("adminToken"); // ✅ Check for token instead of "admin" === "true"
 
   return (
     <Router>
       <div className="app-container">
         <h1>📢 Feedback Tool</h1>
         <Routes>
-          <Route path="/" element={
-            <>
-              <FeedbackForm />
-              <hr />
-              <FeedbackList />
-            </>
-          } />
+          <Route
+            path="/"
+            element={
+              <>
+                <FeedbackForm />
+                <hr />
+                <FeedbackList />
+              </>
+            }
+          />
           <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin-login" />} />
+          <Route
+            path="/admin"
+            element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin-login" />}
+          />
         </Routes>
       </div>
     </Router>

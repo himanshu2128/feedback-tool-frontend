@@ -10,16 +10,20 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAdmin = localStorage.getItem("admin") === "true";
+    const token = localStorage.getItem("adminToken");
 
-    if (!isAdmin) {
+    if (!token) {
       navigate("/admin-login");
       return;
     }
 
-    // Fetch feedback data
+    // Fetch feedback data with token
     axios
-      .get(`${API_BASE_URL}/api/feedback`)
+      .get(`${API_BASE_URL}/api/feedback`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         setFeedbackList(res.data.data);
         setLoading(false);
@@ -27,11 +31,17 @@ function AdminDashboard() {
       .catch((err) => {
         console.error("❌ Failed to fetch feedback:", err);
         setLoading(false);
+
+        // If token is invalid or expired, log out the user
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          localStorage.removeItem("adminToken");
+          navigate("/admin-login");
+        }
       });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("admin");
+    localStorage.removeItem("adminToken");
     navigate("/");
   };
 
