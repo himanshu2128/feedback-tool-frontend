@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 function AdminDashboard() {
   const [feedbackList, setFeedbackList] = useState([]);
 
   useEffect(() => {
-    // Fetch feedback from backend
     axios
-      .get("http://localhost:5000/api/feedback")
+      .get(`${API_BASE_URL}/api/feedback`)
       .then((res) => {
-        setFeedbackList(res.data.feedbackList);
+        setFeedbackList(res.data.data); // ✅ Adjusted to match your backend response structure
       })
       .catch((err) => {
         console.error("❌ Failed to fetch feedback:", err);
@@ -25,7 +26,7 @@ function AdminDashboard() {
         <ul>
           {feedbackList.map((item, index) => (
             <li key={index}>
-              <strong>{new Date(item.timestamp).toLocaleString()}</strong>: {item.message}
+              <strong>{new Date(item.createdAt).toLocaleString()}</strong>: {item.message}
             </li>
           ))}
         </ul>
