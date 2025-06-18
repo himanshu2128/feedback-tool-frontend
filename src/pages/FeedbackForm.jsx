@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { API_BASE_URL } from "../api"; // ✅ Use your env-based API URL
+import { API_BASE_URL } from "../components/api";
+ // ✅ Use your env-based API URL
 
 const FeedbackForm = ({ onSuccess }) => {
   const [message, setMessage] = useState("");
