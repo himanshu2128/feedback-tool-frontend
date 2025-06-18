@@ -1,35 +1,30 @@
-console.log("Loaded API URL:", import.meta.env.VITE_API_URL);
-
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import FeedbackForm from "./pages/FeedbackForm";
 import FeedbackList from "./pages/FeedbackList";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
-  const [refreshList, setRefreshList] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  const handleNewFeedback = () => {
-    setRefreshList(!refreshList);
-  };
+  const isAdmin = localStorage.getItem("admin") === "true";
 
   return (
-    <div className="app-container">
-      <h1>📢 Feedback Tool</h1>
-      <button onClick={() => setIsAdmin(!isAdmin)}>
-        {isAdmin ? "🔙 Back to Feedback Form" : "🛠️ Admin Dashboard"}
-      </button>
-
-      {isAdmin ? (
-        <AdminDashboard />
-      ) : (
-        <>
-          <FeedbackForm onSuccess={handleNewFeedback} />
-          <hr />
-          <FeedbackList refreshTrigger={refreshList} />
-        </>
-      )}
-    </div>
+    <Router>
+      <div className="app-container">
+        <h1>📢 Feedback Tool</h1>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <FeedbackForm />
+              <hr />
+              <FeedbackList />
+            </>
+          } />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <Navigate to="/admin-login" />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
