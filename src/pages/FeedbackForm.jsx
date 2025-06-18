@@ -1,6 +1,6 @@
-// src/pages/FeedbackForm.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api"; // ✅ Use your env-based API URL
 
 const FeedbackForm = ({ onSuccess }) => {
   const [message, setMessage] = useState("");
@@ -14,7 +14,7 @@ const FeedbackForm = ({ onSuccess }) => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/feedback", { message });
+      await axios.post(`${API_BASE_URL}/api/feedback`, { message }); // ✅ Fixed
       alert("✅ Feedback submitted!");
       setMessage("");
       if (onSuccess) onSuccess();
