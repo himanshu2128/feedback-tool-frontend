@@ -4,30 +4,34 @@ import axios from "axios";
 interface FeedbackItem {
   _id: string;
   message: string;
-  timestamp: string; // We'll map createdAt to this
+  timestamp: string;
 }
 
 interface FeedbackListProps {
   refreshTrigger: boolean;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// ✅ No more fallback to localhost
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
 
   const fetchFeedback = async () => {
+    if (!API_BASE_URL) {
+      console.error("VITE_API_URL is not defined in environment variables.");
+      return;
+    }
+
     try {
       const res = await axios.get(`${API_BASE_URL}/api/feedback`);
       const data = res.data;
 
-      // ✅ Check for correct array in `data.data`
       if (Array.isArray(data.data)) {
-       const normalized = data.data.map((item: any) => ({
-
+        const normalized = data.data.map((item: any) => ({
           _id: item._id,
           message: item.message,
-          timestamp: item.createdAt, // backend sends createdAt
+          timestamp: item.createdAt,
         }));
         setFeedbackList(normalized);
       } else {
@@ -40,7 +44,6 @@ const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
     }
   };
 
-  // Run on mount + on refresh trigger change
   useEffect(() => {
     fetchFeedback();
   }, [refreshTrigger]);
