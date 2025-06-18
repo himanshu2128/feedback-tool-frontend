@@ -1,42 +1,17 @@
-// src/pages/FeedbackForm.jsx
-import React, { useState } from "react";
-import axios from "axios";
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export default function FeedbackForm({ onSuccess }) {
-  const [message, setMessage] = useState("");
+export async function submitFeedback({ message }) {
+  const response = await fetch(`${API_BASE_URL}/api/feedback`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message }),
+  });
+  return response.json();
+}
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
-
-    if (!message.trim()) {
-      alert("Please enter some feedback.");
-      return;
-    }
-
-    try {
-      await axios.post("http://localhost:5000/api/feedback", {
-        message,
-      });
-      alert("✅ Feedback submitted!");
-      setMessage(""); // Clear input
-      if (onSuccess) onSuccess(); // Trigger refresh in parent
-    } catch (err) {
-      console.error("❌ Error submitting feedback:", err);
-      alert("Failed to submit feedback.");
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <textarea
-        placeholder="Write your feedback here..."
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        rows="5"
-        cols="50"
-      />
-      <br />
-      <button type="submit">Submit</button>
-    </form>
-  );
+export async function getAllFeedback() {
+  const response = await fetch(`${API_BASE_URL}/api/feedback`);
+  return response.json();
 }
