@@ -1,5 +1,3 @@
-// src/pages/AdminDashboard.tsx
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
@@ -19,24 +17,23 @@ const AdminDashboard: React.FC = () => {
   const fetchFeedbacks = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/feedback`);
-      setFeedbackList(response.data.data); // ✅ expected response.data.data
-      setError("");
+      setFeedbackList(response.data.data);
     } catch (err) {
-      console.error("❌ Failed to fetch feedback:", err);
+      console.error("Failed to fetch feedback:", err);
       setError("❌ Could not load feedback data.");
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this feedback?");
-    if (!confirmDelete) return;
+    const confirm = window.confirm("⚠️ Are you sure you want to delete this feedback?");
+    if (!confirm) return;
 
     try {
       await axios.delete(`${API_BASE_URL}/api/feedback/${id}`);
-      setFeedbackList((prev) => prev.filter((item) => item._id !== id));
+      setFeedbackList(prev => prev.filter(item => item._id !== id));
     } catch (err) {
-      console.error("❌ Failed to delete feedback:", err);
-      setError("❌ Error deleting feedback. Please try again.");
+      console.error("❌ Delete failed:", err);
+      alert("Failed to delete feedback.");
     }
   };
 
@@ -73,12 +70,12 @@ const AdminDashboard: React.FC = () => {
         </button>
       </div>
 
-      {error && <p className="text-red-500 mb-2">{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
 
       {feedbackList.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {feedbackList.map((item) => (
             <li
               key={item._id}
@@ -92,7 +89,7 @@ const AdminDashboard: React.FC = () => {
               </div>
               <button
                 onClick={() => handleDelete(item._id)}
-                className="bg-red-500 text-white px-2 py-1 rounded ml-4 hover:bg-red-600"
+                className="ml-4 bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
               >
                 Delete
               </button>
