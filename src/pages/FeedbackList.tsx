@@ -13,7 +13,7 @@ interface FeedbackListProps {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
+const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger = false }) => {
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

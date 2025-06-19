@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-// ✅ Environment-based API URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const Login: React.FC = () => {
+interface LoginProps {
+  onLogin: () => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -22,6 +25,7 @@ const Login: React.FC = () => {
 
       const token = res.data.token;
       localStorage.setItem("adminToken", token);
+      onLogin(); // ✅ This line is crucial
       navigate("/admin"); // Redirect on successful login
     } catch (err) {
       console.error("Login error:", err);
@@ -42,7 +46,7 @@ const Login: React.FC = () => {
       fontFamily: "sans-serif"
     }}>
       <h2 style={{ textAlign: "center" }}>🔐 Admin Login</h2>
-      
+
       <input
         type="password"
         placeholder="Enter admin password"
@@ -57,7 +61,7 @@ const Login: React.FC = () => {
           fontSize: "16px"
         }}
       />
-      
+
       {errorMsg && (
         <div style={{ color: "red", marginBottom: "10px", fontSize: "14px" }}>
           {errorMsg}
