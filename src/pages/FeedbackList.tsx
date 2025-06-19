@@ -20,7 +20,7 @@ const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
 
   const fetchFeedback = async () => {
     if (!API_BASE_URL) {
-      setError("⚠️ VITE_API_URL not defined.");
+      setError("⚠️ VITE_API_URL not defined in .env file.");
       return;
     }
 
@@ -55,18 +55,42 @@ const FeedbackList: React.FC<FeedbackListProps> = ({ refreshTrigger }) => {
   }, [refreshTrigger]);
 
   return (
-    <div style={{ padding: "1rem", background: "#f9f9f9", borderRadius: "10px", marginTop: "20px" }}>
-      <h2>📝 Feedback List</h2>
+    <div
+      style={{
+        padding: "20px",
+        background: "#ffffff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+        marginTop: "20px",
+        maxWidth: "600px",
+        marginInline: "auto",
+      }}
+    >
+      <h2 style={{ marginBottom: "16px", color: "#333" }}>📝 Feedback List</h2>
 
       {loading && <p>⏳ Loading feedback...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!loading && feedbackList.length === 0 && !error && <p>No feedback available.</p>}
+      {!loading && feedbackList.length === 0 && !error && (
+        <p>No feedback available.</p>
+      )}
 
-      <ul style={{ paddingLeft: "1rem" }}>
-        {feedbackList?.map((item) => (
-          <li key={item._id} style={{ marginBottom: "10px" }}>
-            <strong>{new Date(item.timestamp).toLocaleString()}:</strong> {item.message}
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {feedbackList.map((item) => (
+          <li
+            key={item._id}
+            style={{
+              marginBottom: "14px",
+              padding: "10px",
+              border: "1px solid #eee",
+              borderRadius: "8px",
+              backgroundColor: "#f6f8fa",
+            }}
+          >
+            <div style={{ fontSize: "14px", color: "#666" }}>
+              {new Date(item.timestamp).toLocaleString()}
+            </div>
+            <div style={{ fontSize: "16px", color: "#000" }}>{item.message}</div>
           </li>
         ))}
       </ul>
