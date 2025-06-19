@@ -1,10 +1,12 @@
+// src/pages/AdminDashboard.tsx
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 interface FeedbackItem {
   _id: string;
   message: string;
-  timestamp: string;
+  createdAt: string;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -13,27 +15,28 @@ const AdminDashboard: React.FC = () => {
   const [token, setToken] = useState(localStorage.getItem("adminToken") || "");
   const [feedbackList, setFeedbackList] = useState<FeedbackItem[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchFeedbacks = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/api/feedback`);
       setFeedbackList(response.data.data);
     } catch (err) {
       console.error("Failed to fetch feedback:", err);
       setError("❌ Could not load feedback data.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const confirm = window.confirm("⚠️ Are you sure you want to delete this feedback?");
-    if (!confirm) return;
-
+  const deleteFeedback = async (id: string) => {
     try {
       await axios.delete(`${API_BASE_URL}/api/feedback/${id}`);
-      setFeedbackList(prev => prev.filter(item => item._id !== id));
+      setFeedbackList((prev) => prev.filter((item) => item._id !== id));
     } catch (err) {
-      console.error("❌ Delete failed:", err);
-      alert("Failed to delete feedback.");
+      console.error("Error deleting feedback:", err);
+      setError("❌ Could not delete feedback.");
     }
   };
 
@@ -71,27 +74,26 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
-
-      {feedbackList.length === 0 ? (
+      {loading ? (
+        <p>Loading feedback...</p>
+      ) : feedbackList.length === 0 ? (
         <p>No feedback available.</p>
       ) : (
         <ul className="space-y-2">
           {feedbackList.map((item) => (
             <li
               key={item._id}
-              className="border p-3 rounded shadow-sm bg-gray-50 flex justify-between items-start"
+              className="border p-3 rounded shadow-sm bg-gray-50"
             >
-              <div>
-                <p>{item.message}</p>
-                <small className="text-gray-500">
-                  {new Date(item.timestamp).toLocaleString()}
-                </small>
-              </div>
+              <p>{item.message}</p>
+              <small className="text-gray-500 block">
+                🕒 {new Date(item.createdAt).toLocaleString()}
+              </small>
               <button
-                onClick={() => handleDelete(item._id)}
-                className="ml-4 bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
+                onClick={() => deleteFeedback(item._id)}
+                className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
               >
-                Delete
+                🗑️ Delete
               </button>
             </li>
           ))}
