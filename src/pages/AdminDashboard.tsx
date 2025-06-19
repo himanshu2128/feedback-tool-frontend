@@ -21,7 +21,7 @@ const AdminDashboard: React.FC = () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/api/feedback`);
-      setFeedbackList(response.data.data);
+      setFeedbackList(response.data);
     } catch (err) {
       console.error("Failed to fetch feedback:", err);
       setError("❌ Could not load feedback data.");
